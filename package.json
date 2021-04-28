@@ -1,0 +1,63 @@
+{
+  "author": "Chris Shaw <me@cshaw.xyz>",
+  "description": "Dynamic imports transformer for Vite when using Adobe Experience Manager",
+  "homepage": "https://aem-vite.dev/guide/front-end/dynamic-imports/",
+  "license": "Apache-2.0",
+  "name": "@aem-vite/import-rewriter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aem-vite/import-rewriter"
+  },
+  "bugs": {
+    "url": "https://github.com/aem-vite/import-rewriter/issues"
+  },
+  "version": "1.0.0",
+  "engines": {
+    "node": ">= 12"
+  },
+  "keywords": [
+    "aem",
+    "vite",
+    "rollup",
+    "dynamic-import",
+    "dynamic",
+    "import",
+    "build-tools"
+  ],
+  "files": [
+    "lib"
+  ],
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "types": "lib/types",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "lint": "eslint --ext .ts src/**"
+  },
+  "dependencies": {
+    "es-module-lexer": "^0.4.1",
+    "magic-string": "^0.25.7",
+    "rollup": "^2.38.5",
+    "vite": "^2.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^18.0.0",
+    "@rollup/plugin-node-resolve": "^11.2.1",
+    "@rollup/plugin-typescript": "^8.2.1",
+    "@types/node": "^15.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "eslint": "^7.25.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-node": "^11.1.0",
+    "prettier": "^2.2.1",
+    "semver": "^7.3.5",
+    "typescript": "^4.2.4"
+  },
+  "optionalDependencies": {
+    "fsevents": "~2.3.2"
+  }
+}

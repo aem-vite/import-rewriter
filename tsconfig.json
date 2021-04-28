@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "./lib/types",
+    "esModuleInterop": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "noUnusedLocals": true,
+    "strict": true,
+    "sourceMap": true,
+    "target": "ES2018",
+
+    "lib": ["ESNext"]
+  },
+
+  "include": ["./src"]
+}
