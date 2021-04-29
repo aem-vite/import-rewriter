@@ -14,6 +14,10 @@
 
 A Vite/Rollup transformer that ensures dynamic `import` statements use the correct public path which by default is relative instead of absolute.
 
+## Getting Started
+
+Please refer to [aem-vite.dev](https://aem-vite.dev/guide/front-end/dynamic-imports/) for some background and usage instructions.
+
 ## License
 
 Apache-2.0
