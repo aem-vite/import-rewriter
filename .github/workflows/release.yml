@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  test:
-    runs-on: ubuntu-16.04
+  release:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
