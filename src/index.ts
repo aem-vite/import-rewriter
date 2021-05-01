@@ -6,7 +6,16 @@ import type { OutputPlugin } from 'rollup'
 import type { ConfigEnv } from 'vite/dist/node/index'
 
 export interface ImportRewriterOptions {
+  /**
+   * The current Vite command been used.
+   * @type {String}
+   */
   command: ConfigEnv['command']
+
+  /**
+   * The public path in AEM where your ClientLibs are stored.
+   * @type {String}
+   */
   publicPath: string
 }
 
