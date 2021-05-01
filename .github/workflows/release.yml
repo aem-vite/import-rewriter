@@ -21,6 +21,9 @@ jobs:
       - name: Lint our source code
         run: yarn lint
 
+      - name: Build
+        run: yarn build
+
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
