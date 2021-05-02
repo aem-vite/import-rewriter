@@ -1,7 +1,7 @@
 {
   "author": "Chris Shaw <me@cshaw.xyz>",
   "description": "Dynamic imports transformer for Vite when using Adobe Experience Manager",
-  "homepage": "https://aem-vite.dev/guide/front-end/dynamic-imports/",
+  "homepage": "https://aemvite.dev/guide/front-end/dynamic-imports/",
   "license": "Apache-2.0",
   "name": "@aem-vite/import-rewriter",
   "repository": {

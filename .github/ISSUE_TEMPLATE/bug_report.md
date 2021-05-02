@@ -51,7 +51,7 @@ Used package manager: <!-- npm | yarn | pnpm -->
 ### Before submitting the issue, please make sure you do the following
 
 - [ ] Read the [Contributing Guidelines](https://github.com/aem-vite/import-rewriter/blob/main/.github/contributing.md).
-- [ ] Read the [documentation](https://aem-vite.dev/guide/).
+- [ ] Read the [documentation](https://aemvite.dev/guide/).
 - [ ] Check that there isn't already an issue that reports the same bug to avoid creating a duplicate.
 - [ ] Provide a description in this issue that describes the bug.
 - [ ] Make sure this is an issue with `@aem-vite/aem-vite` and not a Rollup/Vite issue.
