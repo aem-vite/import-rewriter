@@ -7,10 +7,8 @@
     "moduleResolution": "Node",
     "noUnusedLocals": true,
     "strict": true,
-    "sourceMap": true,
-    "target": "ES2018",
-
-    "lib": ["ESNext"]
+    "sourceMap": false,
+    "target": "ES6"
   },
 
   "include": ["./src"]

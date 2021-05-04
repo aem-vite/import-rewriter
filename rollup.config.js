@@ -15,7 +15,7 @@ const config = {
   output: {
     dir: path.resolve(__dirname, 'lib'),
     exports: 'named',
-    sourcemap: true,
+    format: 'commonjs',
   },
 
   external: [
