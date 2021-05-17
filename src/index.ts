@@ -33,7 +33,7 @@ export default function aemViteImportRewriter(options: ImportRewriterOptions): O
     async renderChunk(source, _, rollupOptions) {
       if (!options.command || !options.publicPath || !options.publicPath.length) {
         this.error(
-          `Either 'command' or 'publicPath' haven't been defined, see https://aemvite.dev/guide/faq/#vite-errors for more information.`,
+          `Either 'command' or 'publicPath' haven't been defined, see https://aemvite.dev/guide/faqs/#vite-errors for more information.`,
         )
       }
 
