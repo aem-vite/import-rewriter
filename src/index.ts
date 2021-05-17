@@ -19,9 +19,14 @@ export interface ImportRewriterOptions {
   publicPath: string
 }
 
-export default function aemViteImportRewriter(options: ImportRewriterOptions): OutputPlugin {
-  const pattern = /([.]+\/)+/
+const pattern = /([.]+\/)+/
 
+function getReplacementPath(path: string, options: ImportRewriterOptions): string {
+  // Whenever Vite has been started with the DevServer, change the 'publicPath' to '/' as that is the root dir
+  return path.replace(pattern, options.command === 'serve' ? '/' : options.publicPath)
+}
+
+export default function aemViteImportRewriter(options: ImportRewriterOptions): OutputPlugin {
   return {
     name: 'aem-vite:imports-rewrite',
 
@@ -49,16 +54,19 @@ export default function aemViteImportRewriter(options: ImportRewriterOptions): O
       const str = () => s || (s = new MagicString(source))
 
       for (let index = 0; index < imports.length; index++) {
-        const { e: end, d: dynamicIndex } = imports[index]
+        const { e: end, d: dynamicIndex, n: importPath, s: start } = imports[index]
 
+        // Purely just dynamic imports
         if (dynamicIndex > -1) {
           const dynamicEnd = source.indexOf(')', end) + 1
           const original = source.slice(dynamicIndex, dynamicEnd)
 
-          // Whenever Vite has been started with the DevServer, change the 'publicPath' to '/' as that is the root dir
-          const replacement = original.replace(pattern, options.command === 'serve' ? '/' : options.publicPath)
+          str().overwrite(dynamicIndex, dynamicEnd, getReplacementPath(original, options))
+        }
 
-          str().overwrite(dynamicIndex, dynamicEnd, replacement)
+        // Handle native imports too
+        if (dynamicIndex === -1 && importPath && pattern.test(importPath)) {
+          str().overwrite(start, end, getReplacementPath(importPath, options))
         }
       }
 
