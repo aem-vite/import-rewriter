@@ -1,3 +1,15 @@
+# [1.2.0](https://github.com/aem-vite/import-rewriter/compare/v1.1.2...v1.2.0) (2021-05-17)
+
+
+### Bug Fixes
+
+* corrected faqs link ([d20e2e9](https://github.com/aem-vite/import-rewriter/commit/d20e2e97182c748aacafb9bdfcd95053177d95b0))
+
+
+### Features
+
+* added support for native imports ([65a0e1b](https://github.com/aem-vite/import-rewriter/commit/65a0e1b0eb88656343d5a93e48db78f7c881c0e9))
+
 ## [1.1.2](https://github.com/aem-vite/import-rewriter/compare/v1.1.1...v1.1.2) (2021-05-04)
 
 
