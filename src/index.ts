@@ -28,7 +28,7 @@ function getReplacementPath(path: string, options: ImportRewriterOptions): strin
 
 export default function aemViteImportRewriter(options: ImportRewriterOptions): OutputPlugin {
   return {
-    name: 'aem-vite:imports-rewrite',
+    name: 'aem-vite:import-rewrite',
 
     async renderChunk(source, _, rollupOptions) {
       if (!options.command || !options.publicPath || !options.publicPath.length) {
