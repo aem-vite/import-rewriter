@@ -1,3 +1,11 @@
+## [1.2.1](https://github.com/aem-vite/import-rewriter/compare/v1.2.0...v1.2.1) (2021-05-18)
+
+
+### Bug Fixes
+
+* ensure chunk paths are mapped correctly ([7daf43b](https://github.com/aem-vite/import-rewriter/commit/7daf43b98d288a2d0a559ce342b90f0e5fdc66d7))
+* **dev:** corrected plugin name ([a30cd79](https://github.com/aem-vite/import-rewriter/commit/a30cd795ab422eaaa7f597b292741e3a070bbbc9))
+
 # [1.2.0](https://github.com/aem-vite/import-rewriter/compare/v1.1.2...v1.2.0) (2021-05-17)
 
 
