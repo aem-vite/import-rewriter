@@ -2,7 +2,7 @@ import { init, parse as parseImports } from 'es-module-lexer'
 import MagicString from 'magic-string'
 
 import type { ImportSpecifier } from 'es-module-lexer'
-import type { OutputPlugin, RenderedChunk } from 'rollup'
+import type { OutputPlugin } from 'rollup'
 import type { ConfigEnv } from 'vite/dist/node/index'
 
 export interface ImportRewriterOptions {
@@ -19,23 +19,18 @@ export interface ImportRewriterOptions {
 
 const relativePathPattern = /([.]{1,2}\/)+/
 
-function getReplacementPath(
-  path: string,
-  options: ImportRewriterOptions,
-  chunk: RenderedChunk,
-  isDynamicImport = false,
-): string {
-  const imports = isDynamicImport ? chunk.dynamicImports : chunk.imports
+function getReplacementPath(path: string, options: ImportRewriterOptions, imports: string[]): string {
+  if (options.command === 'serve') {
+    return '/'
+  }
 
   const matchedImport = imports.find((imp) => imp.endsWith(path.replace(relativePathPattern, '')))
 
   return matchedImport
-    ? options.command === 'serve'
-      ? '/'
-      : path.replace(
-          new RegExp(`${relativePathPattern.source}${path.replace(relativePathPattern, '')}`),
-          options.publicPath + matchedImport,
-        )
+    ? path.replace(
+        new RegExp(`${relativePathPattern.source}${path.replace(relativePathPattern, '')}`),
+        options.publicPath + matchedImport,
+      )
     : path
 }
 
@@ -44,6 +39,8 @@ export default function aemViteImportRewriter(options: ImportRewriterOptions): O
     name: 'aem-vite:import-rewrite',
 
     async renderChunk(source, chunk, rollupOptions) {
+      console.log(`Current command: ${options.command}`)
+
       if (!options.command || !options.publicPath || !options.publicPath.length) {
         this.error(
           `Either 'command' or 'publicPath' haven't been defined, see https://aemvite.dev/guide/faqs/#vite-errors for more information.`,
@@ -74,12 +71,12 @@ export default function aemViteImportRewriter(options: ImportRewriterOptions): O
           const dynamicEnd = source.indexOf(')', end) + 1
           const original = source.slice(dynamicIndex + 8, dynamicEnd - 2)
 
-          str().overwrite(dynamicIndex + 8, dynamicEnd - 2, getReplacementPath(original, options, chunk, true))
+          str().overwrite(dynamicIndex + 8, dynamicEnd - 2, getReplacementPath(original, options, chunk.dynamicImports))
         }
 
         // Handle native imports too
         if (dynamicIndex === -1 && importPath && relativePathPattern.test(importPath)) {
-          str().overwrite(start, end, getReplacementPath(importPath, options, chunk))
+          str().overwrite(start, end, getReplacementPath(importPath, options, chunk.imports))
         }
       }
 
