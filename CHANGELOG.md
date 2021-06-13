@@ -1,3 +1,18 @@
+# [2.0.0](https://github.com/aem-vite/import-rewriter/compare/v1.2.1...v2.0.0) (2021-06-13)
+
+
+### Features
+
+* automatic path rewiting with cache support ([4054ff3](https://github.com/aem-vite/import-rewriter/commit/4054ff31142ac058c2e36ca1d875f8b728493061))
+* resolve import entry path for AEM ([8d51559](https://github.com/aem-vite/import-rewriter/commit/8d51559ecbe1ec06e679b803da2af18be63bac3a))
+
+
+### BREAKING CHANGES
+
+* Main entry points are now rewritten
+
+All instances of the main entry point that need to refer back to the AEM ClientLib are automatically rewritten
+
 ## [1.2.1](https://github.com/aem-vite/import-rewriter/compare/v1.2.0...v1.2.1) (2021-05-18)
 
 
