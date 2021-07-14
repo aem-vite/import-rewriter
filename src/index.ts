@@ -6,8 +6,7 @@ import { init, parse as parseImports } from 'es-module-lexer'
 import MagicString from 'magic-string'
 
 import type { ImportSpecifier } from 'es-module-lexer'
-import type { NormalizedOutputOptions, OutputAsset, OutputChunk, OutputPlugin } from 'rollup'
-import type { ConfigEnv } from 'vite/dist/node/index'
+import type { NormalizedOutputOptions, OutputAsset, OutputChunk, OutputPlugin, Plugin } from 'rollup'
 
 export interface AEMLongCacheConfiguration {
   /**
@@ -43,16 +42,21 @@ export interface AEMLongCacheConfiguration {
   minification?: boolean
 }
 
-export interface ImportRewriterOptions {
+export interface BaseImportRewriterOptions {
+  /**
+   * The public path in AEM where your ClientLibs are stored.
+   *
+   * @example
+   * /etc.clienlibs/<project>/clientlibs/<clientlib>
+   */
+  publicPath: string
+}
+
+export interface ImportRewriterOptions extends BaseImportRewriterOptions {
   /**
    * Define how and when caching should be implemented when building bundles.
    */
   caching?: AEMLongCacheConfiguration
-
-  /**
-   * The current Vite command been used.
-   */
-  command: ConfigEnv['command']
 
   /**
    * Define the main entry path used for your Vite builds.
@@ -159,10 +163,6 @@ function getAEMImportFilePath(
  * @returns an AEM compliant ClientLib path
  */
 function getReplacementPath(path: string, options: ImportRewriterOptions, imports: string[]): string {
-  if (options.command === 'serve') {
-    return '/'
-  }
-
   const matchedImport = imports.find((imp) => imp.endsWith(path.replace(relativePathPattern, '')))
 
   return matchedImport
@@ -183,9 +183,9 @@ export default function aemViteImportRewriter(options: ImportRewriterOptions): O
     name: 'aem-vite:import-rewrite',
 
     async renderChunk(source, chunk, rollupOptions) {
-      if (!options.command || !options.publicPath || !options.publicPath.length) {
+      if (!options.publicPath || !options.publicPath.length) {
         this.error(
-          `Either 'command' or 'publicPath' haven't been defined, see https://aemvite.dev/guide/faqs/#vite-errors for more information.`,
+          `'publicPath' doesn't appear to be defined, see https://aemvite.dev/guide/faqs/#vite-errors for more information.`,
         )
       }
 
