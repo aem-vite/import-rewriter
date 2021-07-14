@@ -1,3 +1,35 @@
+# [3.0.0](https://github.com/aem-vite/import-rewriter/compare/v2.0.0...v3.0.0) (2021-07-14)
+
+
+### Code Refactoring
+
+* removed `command` option ([e5085f8](https://github.com/aem-vite/import-rewriter/commit/e5085f8dfb81524699ca8e15b760eb1e06506495))
+
+
+### Features
+
+* added static asset rewriter for css ([9068bcc](https://github.com/aem-vite/import-rewriter/commit/9068bccd07b69daa9cc8f064ae6ab0d65baf4279))
+
+
+### BREAKING CHANGES
+
+* Removed `command` option in favour of plugin enforcement
+
+To reduce any future complexity, you can define when the ES import rewriter will be executed. This can be done as shown in the below example by setting the `apply` option to either `build` or `serve`.
+
+Ensure that `enforce` is always set to `pre` as it will prevent Vite from transforming things first.
+
+```js
+plugins: [
+  {
+    ...aemViteImportRewriter({ /* ... */ }),
+
+    apply: 'build',
+    enforce: 'pre',
+  },
+]
+```
+
 # [2.0.0](https://github.com/aem-vite/import-rewriter/compare/v1.2.1...v2.0.0) (2021-06-13)
 
 
