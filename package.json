@@ -58,6 +58,7 @@
     "es-module-lexer": "^0.4.1",
     "magic-string": "^0.25.7",
     "rollup": "^2.51.2",
+    "rollup-pluginutils": "^2.8.2",
     "vite": "^2.0.0"
   },
   "devDependencies": {

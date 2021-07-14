@@ -4,6 +4,7 @@ import { join } from 'path'
 
 import { init, parse as parseImports } from 'es-module-lexer'
 import MagicString from 'magic-string'
+import { createFilter } from 'rollup-pluginutils'
 
 import type { ImportSpecifier } from 'es-module-lexer'
 import type { NormalizedOutputOptions, OutputAsset, OutputChunk, OutputPlugin, Plugin } from 'rollup'
@@ -74,11 +75,17 @@ export interface ImportRewriterOptions extends BaseImportRewriterOptions {
    * ```
    */
   mainEntryPath?: string
+}
 
+export interface CSSImportRewriterOptions extends BaseImportRewriterOptions {
   /**
-   * The public path in AEM where your ClientLibs are stored.
+   * Base path for static assets. This only needs to be partial so the static path in your CSS
+   * can be replaced by your `assetsDir` path.
+   *
+   * @example
+   * /src/assets
    */
-  publicPath: string
+  assetsBasePath: string
 }
 
 const relativePathPattern = /([.]{1,2}\/)+/
@@ -171,6 +178,27 @@ function getReplacementPath(path: string, options: ImportRewriterOptions, import
         options.publicPath + getAEMImportFilePath(matchedImport, options),
       )
     : path
+}
+
+/**
+ * Identifies all static asset paths and converts them into AEM ClientLib compliant paths.
+ *
+ * @param options import rewriter options
+ */
+export function aemViteCSSImportRewriter(options: CSSImportRewriterOptions): Plugin {
+  const filter = createFilter(/\.(scss|sass|less|styl|stylus|css)$/i, [])
+
+  return {
+    name: 'aem-vite:import-rewrite:css',
+
+    transform(code, id) {
+      if (filter(id)) {
+        code = code.replace(new RegExp(options.assetsBasePath, 'g'), options.publicPath)
+      }
+
+      return { code, id }
+    },
+  }
 }
 
 /**
