@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/aem-vite/import-rewriter/compare/v3.0.0...v3.0.1) (2021-09-21)
+
+
+### Bug Fixes
+
+* ensure JSX extensions are captured ([19ebb6c](https://github.com/aem-vite/import-rewriter/commit/19ebb6c9b98e0164af9ea9b0c1b6f16d37f14bdc))
+
 # [3.0.0](https://github.com/aem-vite/import-rewriter/compare/v2.0.0...v3.0.0) (2021-07-14)
 
 
