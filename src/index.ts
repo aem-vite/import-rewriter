@@ -219,7 +219,7 @@ export default function aemViteImportRewriter(options: ImportRewriterOptions): O
 
       if (
         options.mainEntryPath ||
-        (chunk.isEntry && chunk.facadeModuleId && /(ts|js)$/.test(chunk.facadeModuleId) && !mainEntryPath)
+        (chunk.isEntry && chunk.facadeModuleId && /(ts|js)x?$/.test(chunk.facadeModuleId) && !mainEntryPath)
       ) {
         mainEntryPath = options.mainEntryPath || chunk.fileName
       }
