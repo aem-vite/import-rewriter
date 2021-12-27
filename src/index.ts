@@ -234,7 +234,8 @@ export default function aemViteImportRewriter(options: ImportRewriterOptions): O
       let imports: ReadonlyArray<ImportSpecifier> = []
       try {
         imports = parseImports(source)[0]
-      } catch (e) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
         this.error(e, e.idx)
       }
 
@@ -248,17 +249,12 @@ export default function aemViteImportRewriter(options: ImportRewriterOptions): O
       for (let index = 0; index < imports.length; index++) {
         const { e: end, d: dynamicIndex, n: importPath, s: start } = imports[index]
 
-        // Purely just dynamic imports
-        if (dynamicIndex > -1) {
-          const dynamicEnd = source.indexOf(')', end) + 1
-          const original = source.slice(dynamicIndex + 8, dynamicEnd - 2)
+        if (dynamicIndex === -1 && importPath && mainEntryPath && relativePathPattern.test(importPath)) {
+          const localPath = source.slice(start, end).replace(relativePathPattern, '')
 
-          str().overwrite(dynamicIndex + 8, dynamicEnd - 2, getReplacementPath(original, options, chunk.dynamicImports))
-        }
-
-        // Handle native imports too
-        if (dynamicIndex === -1 && importPath && relativePathPattern.test(importPath)) {
-          str().overwrite(start, end, getReplacementPath(importPath, options, chunk.imports))
+          if (mainEntryPath.indexOf(localPath) !== -1) {
+            str().overwrite(start, end, getReplacementPath(importPath, options, chunk.imports))
+          }
         }
       }
 
