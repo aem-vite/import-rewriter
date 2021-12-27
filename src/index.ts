@@ -196,7 +196,12 @@ export function aemViteCSSImportRewriter(options: CSSImportRewriterOptions): Plu
         code = code.replace(new RegExp(options.assetsBasePath, 'g'), options.publicPath)
       }
 
-      return { code, id }
+      return {
+        code,
+        id,
+        // TODO: Inherited from Vite's TODO to implement source maps
+        map: { mappings: '' },
+      }
     },
   }
 }
