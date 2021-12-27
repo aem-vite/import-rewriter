@@ -142,13 +142,13 @@ function getAEMImportFilePath(
   rollupOptions?: NormalizedOutputOptions,
 ): string {
   if (mainEntryPath && mainEntryPath === path) {
-    path = `${path.substr(0, path.indexOf('/'))}.js`
+    path = `${path.substring(0, path.indexOf('/'))}.js`
 
     if (withCacheChecksum && options.caching && options.caching.enabled && rollupOptions) {
       const entryPath = join(rollupOptions.dir as string, mainEntryPath)
 
       // Remove '.js'
-      path = path.substr(0, path.length - 3)
+      path = path.substring(0, path.length - 3)
 
       // Append the md5 checksum to the path
       path = `${path}.${getCacheKey(entryPath, options.caching.keyFormat)}`
