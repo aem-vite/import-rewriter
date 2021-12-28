@@ -1,18 +1,3 @@
-# [4.0.0](https://github.com/aem-vite/import-rewriter/compare/v3.0.1...v4.0.0) (2021-12-27)
-
-
-### Bug Fixes
-
-* resolve import transformation ([05df22b](https://github.com/aem-vite/import-rewriter/commit/05df22b51bc6e51d63d26fd8fd14e05eefc032fe))
-* resolve sourcemap warning during builds ([9a7e0c1](https://github.com/aem-vite/import-rewriter/commit/9a7e0c1143cab265e8f67e3069dcdb61897a36fd))
-
-
-### BREAKING CHANGES
-
-* Dynamic imports are no longer rewritten
-
-Please ensure that the `base` path in your Vite configuration matches your ClientLib proxy path as Vite will automatically prefix imports using it.
-
 ## [3.0.1](https://github.com/aem-vite/import-rewriter/compare/v3.0.0...v3.0.1) (2021-09-21)
 
 
