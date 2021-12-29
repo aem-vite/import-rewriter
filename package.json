@@ -68,7 +68,7 @@
   "devDependencies": {
     "@commitlint/cli": "^16.0.1",
     "@commitlint/config-conventional": "^16.0.0",
-    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/git": "^10.0.1",
     "@types/node": "^12.20.39",
     "@typescript-eslint/eslint-plugin": "^5.8.1",
