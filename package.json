@@ -1,6 +1,6 @@
 {
   "author": "Chris Shaw <me@cshaw.xyz>",
-  "description": "Dynamic imports transformer for Vite when using Adobe Experience Manager",
+  "description": "Dynamic imports transformer and CSS path rewriter for Vite when using Adobe Experience Manager",
   "homepage": "https://aemvite.dev/guide/front-end/dynamic-imports/",
   "license": "Apache-2.0",
   "name": "@aem-vite/import-rewriter",
@@ -29,15 +29,21 @@
   ],
   "sideEffects": false,
   "main": "lib/index.js",
-  "types": "lib/types",
+  "module": "lib/index.mjs",
+  "exports": {
+    "import": "./lib/index.mjs",
+    "require": "./lib/index.js"
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/",
     "tag": "latest"
   },
   "scripts": {
-    "build": "rollup -c",
-    "build:watch": "rollup -w -c",
+    "clean": "rimraf lib/*",
+    "dev": "yarn bundle --watch",
+    "build": "yarn clean && yarn bundle",
+    "bundle": "tsup src/index.ts --sourcemap --dts --format cjs,esm --outDir lib",
     "lint": "eslint --ext .ts src/**",
     "prepare": "husky install",
     "semantic-release": "semantic-release"
@@ -55,32 +61,31 @@
     }
   },
   "dependencies": {
-    "es-module-lexer": "^0.4.1",
+    "es-module-lexer": "^0.9.3",
     "magic-string": "^0.25.7",
-    "rollup": "^2.51.2",
-    "rollup-pluginutils": "^2.8.2",
-    "vite": "^2.0.0"
+    "rollup-pluginutils": "^2.8.2"
   },
   "devDependencies": {
-    "@commitlint/cli": "^12.1.4",
-    "@commitlint/config-conventional": "^12.1.4",
-    "@rollup/plugin-commonjs": "^19.0.0",
-    "@rollup/plugin-node-resolve": "^13.0.0",
-    "@rollup/plugin-typescript": "^8.2.1",
-    "@semantic-release/changelog": "^5.0.1",
-    "@semantic-release/git": "^9.0.0",
-    "@types/node": "^12.20.15",
-    "@typescript-eslint/eslint-plugin": "^4.26.1",
-    "@typescript-eslint/parser": "^4.26.1",
-    "eslint": "^7.28.0",
+    "@commitlint/cli": "^16.0.1",
+    "@commitlint/config-conventional": "^16.0.0",
+    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/git": "^10.0.1",
+    "@types/node": "^12.20.39",
+    "@typescript-eslint/eslint-plugin": "^5.8.1",
+    "@typescript-eslint/parser": "^5.8.1",
+    "eslint": "^8.5.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^3.4.0",
-    "husky": "^6.0.0",
-    "prettier": "^2.3.1",
-    "semantic-release": "^17.4.3",
-    "tslib": "^2.2.0",
-    "typescript": "^4.3.2"
+    "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^7.0.4",
+    "prettier": "^2.5.1",
+    "semantic-release": "^18.0.1",
+    "tsup": "^5.11.9",
+    "typescript": "^4.5.4",
+    "vite": "*"
+  },
+  "peerDependencies": {
+    "vite": ">2.0.0-0"
   },
   "optionalDependencies": {
     "fsevents": "~2.3.2"

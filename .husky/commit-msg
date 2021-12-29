@@ -1,6 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-if [ -z ${CI+x} ]; then
-  yarn commitlint --edit $1
-fi
+yarn commitlint --edit $1
