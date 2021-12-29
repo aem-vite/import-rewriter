@@ -84,34 +84,67 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
       return null
     },
 
-    writeBundle(rollupOptions, bundles) {
+    async writeBundle(rollupOptions, bundles) {
       const mainEntryPath = getMainEntryPath()
 
-      for (const [fileName, chunkOrAsset] of Object.entries(bundles)) {
-        if (
-          !options.caching ||
-          !options.caching.enabled ||
-          !mainEntryPath ||
-          mainEntryPath === fileName ||
-          !isOutputChunk(chunkOrAsset) ||
-          !chunkOrAsset.code
-        ) {
+      for (const [fileName, chunk] of Object.entries(bundles)) {
+        if (!isOutputChunk(chunk) || !chunk.code) {
           continue
         }
 
-        const mainEntryAEMPath = getAEMImportFilePath(mainEntryPath, options)
+        const source = chunk.code
 
-        const mainEntryAEMPathWithHash = getAEMImportFilePath(
-          mainEntryPath,
-          options,
-          true,
-          rollupOptions as NormalizedOutputOptions,
-        )
+        if (mainEntryPath === fileName && options.caching && options.caching.enabled) {
+          const mainEntryAEMPath = getAEMImportFilePath(mainEntryPath, options)
 
-        writeFileSync(
-          join(rollupOptions.dir as string, fileName),
-          chunkOrAsset.code.replace(mainEntryAEMPath, mainEntryAEMPathWithHash),
-        )
+          const mainEntryAEMPathWithHash = getAEMImportFilePath(
+            mainEntryPath,
+            options,
+            true,
+            rollupOptions as NormalizedOutputOptions,
+          )
+
+          writeFileSync(
+            join(rollupOptions.dir as string, fileName),
+            source.replace(mainEntryAEMPath, mainEntryAEMPathWithHash),
+          )
+        } else {
+          await init
+
+          let imports: ReadonlyArray<ImportSpecifier> = []
+          try {
+            imports = parseImports(source)[0]
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } catch (e: any) {
+            this.error(e, e.idx)
+          }
+
+          if (!imports.length) {
+            continue
+          }
+
+          let s!: MagicString
+          const str = () => s || (s = new MagicString(source))
+
+          for (let index = 0; index < imports.length; index++) {
+            const { e: end, d: dynamicIndex } = imports[index]
+
+            if (dynamicIndex > -1) {
+              const dynamicEnd = source.indexOf(')', end) + 1
+              const original = source.slice(dynamicIndex + 8, dynamicEnd - 2)
+
+              if (!original.startsWith('/')) {
+                str().overwrite(
+                  dynamicIndex + 8,
+                  dynamicEnd - 2,
+                  getReplacementPath(original, options, chunk.dynamicImports),
+                )
+              }
+            }
+          }
+
+          writeFileSync(join(rollupOptions.dir as string, fileName), (s && s.toString()) || source)
+        }
       }
     },
   }
