@@ -1,3 +1,15 @@
+# [4.1.0](https://github.com/aem-vite/import-rewriter/compare/v4.0.0...v4.1.0) (2021-12-29)
+
+
+### Bug Fixes
+
+* ensure css bundles aren't omitted ([3a5fc78](https://github.com/aem-vite/import-rewriter/commit/3a5fc78d4f6544a5fc5cdfe7414e0b4cf33b276e))
+
+
+### Features
+
+* restore dynamic import support ([b1490d5](https://github.com/aem-vite/import-rewriter/commit/b1490d5b00bfe05fe84b7b27993e49315ebfdd7a))
+
 # [4.0.0](https://github.com/aem-vite/import-rewriter/compare/v3.0.1...v4.0.0) (2021-12-28)
 
 
