@@ -19,13 +19,13 @@ export function cssImportRewriter(options: CssImportRewriterOptions): Plugin {
     transform(code, id) {
       if (filter(id)) {
         code = code.replace(new RegExp(options.assetsBasePath, 'g'), options.publicPath)
-      }
 
-      return {
-        code,
-        id,
-        // TODO: Inherited from Vite's TODO to implement source maps
-        map: { mappings: '' },
+        return {
+          code,
+          id,
+          // TODO: Inherited from Vite's TODO to implement source maps
+          map: { mappings: '' },
+        }
       }
     },
   }
