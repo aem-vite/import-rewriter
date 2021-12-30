@@ -10,6 +10,14 @@
 
 * restore dynamic import support ([b1490d5](https://github.com/aem-vite/import-rewriter/commit/b1490d5b00bfe05fe84b7b27993e49315ebfdd7a))
 
+
+### BREAKING CHANGES
+
+* The default export has been replaced with a named export
+* The `aemViteCSSImportRewriter` export has been renamed to `cssImportRewriter`
+
+To better align with community standards, the default export has been changed to a named export called `bundlesImportRewriter`.
+
 # [4.0.0](https://github.com/aem-vite/import-rewriter/compare/v3.0.1...v4.0.0) (2021-12-28)
 
 
