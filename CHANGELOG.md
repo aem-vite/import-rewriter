@@ -1,3 +1,10 @@
+## [4.1.1](https://github.com/aem-vite/import-rewriter/compare/v4.1.0...v4.1.1) (2022-01-19)
+
+
+### Bug Fixes
+
+* resolve import paths with caching enabled ([f5c2a35](https://github.com/aem-vite/import-rewriter/commit/f5c2a357b9f7c0f4d748969caa47eb49f0287944))
+
 # [4.1.0](https://github.com/aem-vite/import-rewriter/compare/v4.0.0...v4.1.0) (2021-12-29)
 
 
