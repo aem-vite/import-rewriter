@@ -5,12 +5,12 @@ import { init, parse as parseImports } from 'es-module-lexer'
 import MagicString from 'magic-string'
 
 import {
+  debug,
   getAEMImportFilePath,
   getMainEntryPath,
   getReplacementPath,
   hasMainEntryPath,
   isOutputChunk,
-  logger,
   relativePathPattern,
   setMainEntryPath,
 } from './helpers'
@@ -47,7 +47,7 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
         options.mainEntryPath ||
         (chunk.isEntry && chunk.facadeModuleId && /(ts|js)x?$/.test(chunk.facadeModuleId) && !hasMainEntryPath())
       ) {
-        logger('setting main entry path', options.mainEntryPath || chunk.fileName)
+        debug('setting main entry path: %s\n', options.mainEntryPath || chunk.fileName)
 
         setMainEntryPath(options.mainEntryPath || chunk.fileName)
       }
@@ -73,7 +73,12 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
         const { e: end, d: dynamicIndex, n: importPath, s: start } = imports[index]
 
         if (dynamicIndex === -1 && importPath && relativePathPattern.test(importPath)) {
-          logger('render chunk (dynamic import)', importPath, getReplacementPath(importPath, options, chunk.imports))
+          debug('render chunk (dynamic import) chunk: %s', chunk.fileName)
+          debug('render chunk (dynamic import) import: %s', importPath)
+          debug(
+            'render chunk (dynamic import) replacement: %s\n',
+            getReplacementPath(importPath, options, chunk.imports),
+          )
 
           str().overwrite(start, end, getReplacementPath(importPath, options, chunk.imports))
         }
@@ -92,6 +97,13 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
     async writeBundle(rollupOptions, bundles) {
       const mainEntryPath = getMainEntryPath()
       const mainEntryAEMPath = getAEMImportFilePath(mainEntryPath, options)
+
+      const mainEntryAEMPathWithHash = getAEMImportFilePath(
+        mainEntryPath,
+        options,
+        true,
+        rollupOptions as NormalizedOutputOptions,
+      )
 
       for (const [fileName, chunk] of Object.entries(bundles)) {
         if (!isOutputChunk(chunk) || !chunk.code) {
@@ -120,7 +132,8 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
         for (let index = 0; index < imports.length; index++) {
           const { e: end, d: dynamicIndex, n: importPath, s: start } = imports[index]
 
-          logger('write bundle (dynamic import)', importPath)
+          debug('write bundle (dynamic import) chunk: %s', chunk.fileName)
+          debug('write bundle (dynamic import) import: %s\n', importPath)
 
           // Native imports
           if (
@@ -128,13 +141,6 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
             importPath &&
             importPath.substring(importPath.lastIndexOf('/') + 1) === mainEntryAEMPath
           ) {
-            const mainEntryAEMPathWithHash = getAEMImportFilePath(
-              mainEntryPath,
-              options,
-              true,
-              rollupOptions as NormalizedOutputOptions,
-            )
-
             str().overwrite(
               start,
               end,
@@ -157,7 +163,12 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
           }
         }
 
-        writeFileSync(join(rollupOptions.dir as string, fileName), (s && s.toString()) || source)
+        let newSource = (s && s.toString()) || source
+
+        // Ensure all entry file imports are replaced with the correct AEM ClientLib path
+        newSource = newSource.replace(new RegExp(mainEntryPath, 'g'), mainEntryAEMPathWithHash)
+
+        writeFileSync(join(rollupOptions.dir as string, fileName), newSource)
       }
     },
   }
