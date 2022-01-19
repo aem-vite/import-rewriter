@@ -10,6 +10,7 @@ import {
   getReplacementPath,
   hasMainEntryPath,
   isOutputChunk,
+  logger,
   relativePathPattern,
   setMainEntryPath,
 } from './helpers'
@@ -46,6 +47,8 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
         options.mainEntryPath ||
         (chunk.isEntry && chunk.facadeModuleId && /(ts|js)x?$/.test(chunk.facadeModuleId) && !hasMainEntryPath())
       ) {
+        logger('setting main entry path', options.mainEntryPath || chunk.fileName)
+
         setMainEntryPath(options.mainEntryPath || chunk.fileName)
       }
 
@@ -70,6 +73,8 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
         const { e: end, d: dynamicIndex, n: importPath, s: start } = imports[index]
 
         if (dynamicIndex === -1 && importPath && relativePathPattern.test(importPath)) {
+          logger('render chunk (dynamic import)', importPath, getReplacementPath(importPath, options, chunk.imports))
+
           str().overwrite(start, end, getReplacementPath(importPath, options, chunk.imports))
         }
       }
@@ -86,6 +91,7 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
 
     async writeBundle(rollupOptions, bundles) {
       const mainEntryPath = getMainEntryPath()
+      const mainEntryAEMPath = getAEMImportFilePath(mainEntryPath, options)
 
       for (const [fileName, chunk] of Object.entries(bundles)) {
         if (!isOutputChunk(chunk) || !chunk.code) {
@@ -94,57 +100,64 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
 
         const source = chunk.code
 
-        if (mainEntryPath === fileName && options.caching && options.caching.enabled) {
-          const mainEntryAEMPath = getAEMImportFilePath(mainEntryPath, options)
+        await init
 
-          const mainEntryAEMPathWithHash = getAEMImportFilePath(
-            mainEntryPath,
-            options,
-            true,
-            rollupOptions as NormalizedOutputOptions,
-          )
+        let imports: ReadonlyArray<ImportSpecifier> = []
+        try {
+          imports = parseImports(source)[0]
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (e: any) {
+          this.error(e, e.idx)
+        }
 
-          writeFileSync(
-            join(rollupOptions.dir as string, fileName),
-            source.replace(mainEntryAEMPath, mainEntryAEMPathWithHash),
-          )
-        } else {
-          await init
+        if (!imports.length) {
+          continue
+        }
 
-          let imports: ReadonlyArray<ImportSpecifier> = []
-          try {
-            imports = parseImports(source)[0]
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } catch (e: any) {
-            this.error(e, e.idx)
+        let s!: MagicString
+        const str = () => s || (s = new MagicString(source))
+
+        for (let index = 0; index < imports.length; index++) {
+          const { e: end, d: dynamicIndex, n: importPath, s: start } = imports[index]
+
+          logger('write bundle (dynamic import)', importPath)
+
+          // Native imports
+          if (
+            dynamicIndex === -1 &&
+            importPath &&
+            importPath.substring(importPath.lastIndexOf('/') + 1) === mainEntryAEMPath
+          ) {
+            const mainEntryAEMPathWithHash = getAEMImportFilePath(
+              mainEntryPath,
+              options,
+              true,
+              rollupOptions as NormalizedOutputOptions,
+            )
+
+            str().overwrite(
+              start,
+              end,
+              importPath.substring(0, importPath.lastIndexOf('/') + 1) + mainEntryAEMPathWithHash,
+            )
           }
 
-          if (!imports.length) {
-            continue
-          }
+          // Dynamic imports
+          if (dynamicIndex > -1) {
+            const dynamicEnd = source.indexOf(')', end) + 1
+            const original = source.slice(dynamicIndex + 8, dynamicEnd - 2)
 
-          let s!: MagicString
-          const str = () => s || (s = new MagicString(source))
-
-          for (let index = 0; index < imports.length; index++) {
-            const { e: end, d: dynamicIndex } = imports[index]
-
-            if (dynamicIndex > -1) {
-              const dynamicEnd = source.indexOf(')', end) + 1
-              const original = source.slice(dynamicIndex + 8, dynamicEnd - 2)
-
-              if (!original.startsWith('/')) {
-                str().overwrite(
-                  dynamicIndex + 8,
-                  dynamicEnd - 2,
-                  getReplacementPath(original, options, chunk.dynamicImports),
-                )
-              }
+            if (!original.startsWith('/')) {
+              str().overwrite(
+                dynamicIndex + 8,
+                dynamicEnd - 2,
+                getReplacementPath(original, options, chunk.dynamicImports),
+              )
             }
           }
-
-          writeFileSync(join(rollupOptions.dir as string, fileName), (s && s.toString()) || source)
         }
+
+        writeFileSync(join(rollupOptions.dir as string, fileName), (s && s.toString()) || source)
       }
     },
   }
