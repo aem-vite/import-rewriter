@@ -1,3 +1,10 @@
+## [4.1.2](https://github.com/aem-vite/import-rewriter/compare/v4.1.1...v4.1.2) (2022-01-19)
+
+
+### Bug Fixes
+
+* resolve entry file import dependency paths ([dda6521](https://github.com/aem-vite/import-rewriter/commit/dda652126c91ad9451411c9c492333a801eeb4b9))
+
 ## [4.1.1](https://github.com/aem-vite/import-rewriter/compare/v4.1.0...v4.1.1) (2022-01-19)
 
 
