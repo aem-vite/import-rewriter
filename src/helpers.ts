@@ -1,4 +1,5 @@
 import { createHash } from 'crypto'
+import _debug from 'debug'
 import { existsSync, readFileSync } from 'fs'
 import { join } from 'path'
 
@@ -6,9 +7,18 @@ import type { NormalizedOutputOptions, OutputAsset, OutputChunk } from 'rollup'
 
 import type { AEMLongCacheConfiguration, BundlesImportRewriterOptions } from './types'
 
+const debug = _debug('aem-vite-import-rewriter')
+
 let mainEntryPath!: string
 
 export const relativePathPattern = /([.]{1,2}\/)+/
+
+/**
+ * Send debugging information onto the local debug instance.
+ */
+export function logger(...args: any[]) {
+  debug(args)
+}
 
 /**
  * Check if the main entry file path has been set.
