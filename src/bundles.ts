@@ -98,16 +98,15 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
       const mainEntryPath = getMainEntryPath()
       const mainEntryAEMPath = getAEMImportFilePath(mainEntryPath, options)
 
-      const mainEntryAEMPathWithHash = getAEMImportFilePath(
-        mainEntryPath,
-        options,
-        true,
-        rollupOptions as NormalizedOutputOptions,
-      )
-
       for (const [fileName, chunk] of Object.entries(bundles)) {
         if (!isOutputChunk(chunk) || !chunk.code) {
           continue
+        }
+
+        let aemImportPath = mainEntryAEMPath
+
+        if (options.caching && options.caching.enabled) {
+          aemImportPath = getAEMImportFilePath(mainEntryPath, options, true, rollupOptions as NormalizedOutputOptions)
         }
 
         const source = chunk.code
@@ -141,11 +140,7 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
             importPath &&
             importPath.substring(importPath.lastIndexOf('/') + 1) === mainEntryAEMPath
           ) {
-            str().overwrite(
-              start,
-              end,
-              importPath.substring(0, importPath.lastIndexOf('/') + 1) + mainEntryAEMPathWithHash,
-            )
+            str().overwrite(start, end, importPath.substring(0, importPath.lastIndexOf('/') + 1) + aemImportPath)
           }
 
           // Dynamic imports
@@ -166,7 +161,7 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
         let newSource = (s && s.toString()) || source
 
         // Ensure all entry file imports are replaced with the correct AEM ClientLib path
-        newSource = newSource.replace(new RegExp(mainEntryPath, 'g'), mainEntryAEMPathWithHash)
+        newSource = newSource.replace(new RegExp(mainEntryPath, 'g'), aemImportPath)
 
         writeFileSync(join(rollupOptions.dir as string, fileName), newSource)
       }

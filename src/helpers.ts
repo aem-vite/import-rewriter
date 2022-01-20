@@ -89,7 +89,7 @@ export function getAEMImportFilePath(
   if (mainEntryPath && mainEntryPath === path) {
     path = `${path.substring(0, path.indexOf('/'))}.js`
 
-    if (withCacheChecksum && options.caching && options.caching.enabled && rollupOptions) {
+    if (withCacheChecksum && options.caching && options.caching.enabled && rollupOptions !== undefined) {
       const entryPath = join(rollupOptions.dir as string, mainEntryPath)
 
       // Remove '.js'
