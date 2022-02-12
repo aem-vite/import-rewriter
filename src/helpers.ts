@@ -3,38 +3,31 @@ import _debug from 'debug'
 import { existsSync, readFileSync } from 'fs'
 import { join } from 'path'
 
-import type { NormalizedOutputOptions, OutputAsset, OutputChunk } from 'rollup'
+import type { InputOptions, NormalizedOutputOptions, OutputAsset, OutputChunk } from 'rollup'
 
 import type { AEMLongCacheConfiguration, BundlesImportRewriterOptions } from './types'
 
-let mainEntryPath!: string
+const entryPaths = new Set<string>()
 
 export const debug = _debug('aem-vite-import-rewriter')
 export const relativePathPattern = /([.]{1,2}\/)+/
 
 /**
- * Check if the main entry file path has been set.
+ * Retrieve the entry file paths.
+ *
+ * @returns entry paths
  */
-export function hasMainEntryPath(): boolean {
-  return (mainEntryPath && mainEntryPath.length > 0) || false
+export function getEntryPaths() {
+  return entryPaths
 }
 
 /**
- * Retrieve the main entry file path.
+ * Add the provided `path` to the available entry paths.
  *
- * @returns the main entry path
+ * @param path the path to the entry file
  */
-export function getMainEntryPath(): string {
-  return mainEntryPath
-}
-
-/**
- * Set the entry file path.
- *
- * @param path the path to the main entry file
- */
-export function setMainEntryPath(path: string): void {
-  mainEntryPath = path
+export function setEntryPath(path: string): void {
+  entryPaths.add(path)
 }
 
 /**
@@ -61,66 +54,93 @@ export function generateChecksum(source: string): string {
  * Generates a unique cache key for the provided `path` that importing modules will use to
  * load the correct entry file.
  *
- * @param path the import path
+ * @param entryPath the base ClientLib path
  * @param keyFormat HTML Library Manager long cache format
  * @returns a unqiue cache key for the provided `path`
  */
-export function getCacheKey(path: string, keyFormat: AEMLongCacheConfiguration['keyFormat']): string {
+export function getCacheKey(entryPath: string, keyFormat: AEMLongCacheConfiguration['keyFormat']): string {
   const keyFormatString = keyFormat === undefined ? 'lc-%s-lc' : typeof keyFormat === 'string' ? keyFormat : '%s'
 
-  return keyFormatString.replace('%s', existsSync(path) ? generateChecksum(readFileSync(path).toString()) : 'unknown')
+  const combinedContents = [...entryPaths].map((entry) => {
+    const path = join(entryPath, entry)
+
+    return existsSync(path) ? readFileSync(path).toString() : ''
+  })
+
+  return keyFormatString.replace('%s', generateChecksum(combinedContents.join('')))
 }
 
 /**
- * Determines whether to use the native AEM ClientLib path or the provided `path`.
+ * Constructs an AEM ClientLib path for the current configuration.
  *
- * @param path the import path
  * @param options import rewriter options
- * @param withCacheChecksum should the checksum be added to the path?
+ * @param forImport is the ClientLib path for an import?
+ * @param withChecksum should a checksum be generated?
  * @param rollupOptions rollup options object
- * @returns the real AEM ClientLib path or the original `path`
+ * @returns the real AEM ClientLib path
  */
-export function getAEMImportFilePath(
-  path: string,
+export function getAemClientLibPath(
   options: BundlesImportRewriterOptions,
-  withCacheChecksum = false,
+  forImport = false,
+  withChecksum = false,
   rollupOptions?: NormalizedOutputOptions,
 ): string {
-  if (mainEntryPath && mainEntryPath === path) {
-    path = `${path.substring(0, path.indexOf('/'))}.js`
+  let path = options.publicPath
 
-    if (withCacheChecksum && options.caching && options.caching.enabled && rollupOptions !== undefined) {
-      const entryPath = join(rollupOptions.dir as string, mainEntryPath)
-
-      // Remove '.js'
-      path = path.substring(0, path.length - 3)
-
-      // Append the md5 checksum to the path
-      path = `${path}.${getCacheKey(entryPath, options.caching.keyFormat)}`
-
-      // Append the extension to the path
-      path = `${path}.${options.caching.minification === true ? 'min.js' : 'js'}`
-    }
+  if (forImport) {
+    return `${path}/${options.resourcesPath}/`
   }
 
-  return path
+  if (withChecksum && options.caching && options.caching.enabled && rollupOptions !== undefined) {
+    const entryPath = rollupOptions.dir as string
+
+    // Append the md5 checksum to the path
+    path = `${path}.${getCacheKey(entryPath, options.caching.keyFormat)}`
+
+    return `${path}${options.minify === true ? '.min' : ''}.js`
+  }
+
+  return `${path}.js`
 }
 
 /**
  * Converts the standard import path into an AEM compliant ClientLib path.
  *
+ * @param parentPath path of the parent (chunk)
  * @param path the import path
  * @param options import rewriter options
- * @param imports a list of available imports
+ * @param entryAliases rollup entry aliases
  * @returns an AEM compliant ClientLib path
  */
-export function getReplacementPath(path: string, options: BundlesImportRewriterOptions, imports: string[]): string {
-  const matchedImport = imports.find((imp) => imp.endsWith(path.replace(relativePathPattern, '')))
+export function getReplacementPath(
+  parentPath: string,
+  path: string,
+  options: BundlesImportRewriterOptions,
+  entryAliases: NonNullable<InputOptions['input']>,
+): string {
+  const isEntryPath = entryPaths.has(parentPath)
 
-  return matchedImport
+  if (isEntryPath) {
+    return path.replace(new RegExp(`^${relativePathPattern.source}`), getAemClientLibPath(options, true))
+  }
+
+  return isInputAnEntryAlias(path, entryAliases)
     ? path.replace(
         new RegExp(`${relativePathPattern.source}${path.replace(relativePathPattern, '')}`),
-        options.publicPath + getAEMImportFilePath(matchedImport, options),
+        getAemClientLibPath(options),
       )
     : path
+}
+
+/**
+ * Determines if the provided `input` is an entry alias or not.
+ *
+ * @param input the string to check against
+ * @param entryAliases rollup entry aliases
+ * @returns `true` when `input` is an alias, otherwise `false`
+ */
+export function isInputAnEntryAlias(input: string, entryAliases: NonNullable<InputOptions['input']>) {
+  const entryAliasesExpr = new RegExp(`^[./]+(${Object.keys(entryAliases).join('|')})\\.js$`)
+
+  return input.match(entryAliasesExpr)?.[0] ? true : false
 }

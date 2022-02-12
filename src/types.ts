@@ -22,14 +22,6 @@ export interface AEMLongCacheConfiguration {
    * @default lc-%s-lc
    */
   keyFormat?: string | false
-
-  /**
-   * Define whether your HTML Library Manager configuration has the `minify` option enabled.
-   * This will replace `.js` with `.min.js` to match AEM.
-   *
-   * @default false
-   */
-  minification?: boolean
 }
 
 export interface BaseImportRewriterOptions {
@@ -40,6 +32,13 @@ export interface BaseImportRewriterOptions {
    * /etc.clienlibs/<project>/clientlibs/<clientlib>
    */
   publicPath: string
+  /**
+   * The path to where bundles and chunks are stored. This should be the same for both.
+   *
+   * @example
+   * resources/js
+   */
+  resourcesPath: string
 }
 
 export interface BundlesImportRewriterOptions extends BaseImportRewriterOptions {
@@ -47,32 +46,11 @@ export interface BundlesImportRewriterOptions extends BaseImportRewriterOptions 
    * Define how and when caching should be implemented when building bundles.
    */
   caching?: AEMLongCacheConfiguration
-
   /**
-   * Define the main entry path used for your Vite builds.
+   * Define whether your HTML Library Manager configuration has the `minify` option enabled.
+   * This will replace `.js` with `.min.js` to match AEM.
    *
-   * The AEM Vite import rewriter plugin will automatically assume the first entry defined is
-   * the correct file but you can override this for each Vite configuration.
-   *
-   * Any path you do define needs to be relative to your configured output directory.
-   *
-   * @example
-   * ```ts
-   * {
-   *   mainEntryPath: 'core.footer/resources/js/main.js',
-   * }
-   * ```
+   * @default false
    */
-  mainEntryPath?: string
-}
-
-export interface CssImportRewriterOptions extends BaseImportRewriterOptions {
-  /**
-   * Base path for static assets. This only needs to be partial so the static path in your CSS
-   * can be replaced by your `assetsDir` path.
-   *
-   * @example
-   * /src/assets
-   */
-  assetsBasePath: string
+  minify?: boolean
 }

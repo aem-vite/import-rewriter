@@ -6,17 +6,16 @@ import MagicString from 'magic-string'
 
 import {
   debug,
-  getAEMImportFilePath,
-  getMainEntryPath,
+  getAemClientLibPath,
+  getEntryPaths,
   getReplacementPath,
-  hasMainEntryPath,
   isOutputChunk,
   relativePathPattern,
-  setMainEntryPath,
+  setEntryPath,
 } from './helpers'
 
 import type { ImportSpecifier } from 'es-module-lexer'
-import type { NormalizedOutputOptions } from 'rollup'
+import type { InputOptions, NormalizedOutputOptions } from 'rollup'
 import type { Plugin } from 'vite'
 
 import type { BundlesImportRewriterOptions } from './types'
@@ -27,10 +26,34 @@ import type { BundlesImportRewriterOptions } from './types'
  * @param options import rewriter options
  */
 export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Plugin {
+  const entryAliases: NonNullable<InputOptions['input']> = {}
+
   return {
     apply: 'build',
     enforce: 'post',
     name: 'aem-vite:import-rewriter',
+
+    configResolved(config) {
+      const inputs = config.build.rollupOptions.input
+
+      if (!inputs || typeof inputs !== 'object' || Array.isArray(inputs)) {
+        throw new Error(
+          'Missing valid input aliases which are required to map to an AEM ClientLib path, see https://www.aemvite.dev/guide/front-end/vite/#source-structure for more information.',
+        )
+      }
+
+      for (const [key, value] of Object.entries(inputs)) {
+        if (/(ts|js)x?$/.test(value)) {
+          entryAliases[key] = value
+        }
+      }
+
+      if (Object.keys(entryAliases).length > 1) {
+        throw new Error(
+          'Invalid number of JavaScript inputs provided. Only a single input is currently supported which is a limitation of AEM ClientLibs. It is recommended to create a second ClientLib and Vite config if you need to meet this need.',
+        )
+      }
+    },
 
     async renderChunk(source, chunk, rollupOptions) {
       if (rollupOptions.format !== 'es') {
@@ -43,13 +66,10 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
         )
       }
 
-      if (
-        options.mainEntryPath ||
-        (chunk.isEntry && chunk.facadeModuleId && /(ts|js)x?$/.test(chunk.facadeModuleId) && !hasMainEntryPath())
-      ) {
-        debug('setting main entry path: %s\n', options.mainEntryPath || chunk.fileName)
+      if (chunk.isEntry && chunk.facadeModuleId && /(ts|js)x?$/.test(chunk.facadeModuleId)) {
+        debug('setting new entry path: %s\n', chunk.fileName)
 
-        setMainEntryPath(options.mainEntryPath || chunk.fileName)
+        setEntryPath(chunk.fileName)
       }
 
       await init
@@ -73,14 +93,13 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
         const { e: end, d: dynamicIndex, n: importPath, s: start } = imports[index]
 
         if (dynamicIndex === -1 && importPath && relativePathPattern.test(importPath)) {
+          const replacementPath = getReplacementPath(chunk.fileName, importPath, options, entryAliases)
+
           debug('render chunk (dynamic import) chunk: %s', chunk.fileName)
           debug('render chunk (dynamic import) import: %s', importPath)
-          debug(
-            'render chunk (dynamic import) replacement: %s\n',
-            getReplacementPath(importPath, options, chunk.imports),
-          )
+          debug('render chunk (dynamic import) replacement: %s\n', replacementPath)
 
-          str().overwrite(start, end, getReplacementPath(importPath, options, chunk.imports))
+          str().overwrite(start, end, replacementPath)
         }
       }
 
@@ -95,18 +114,11 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
     },
 
     async writeBundle(rollupOptions, bundles) {
-      const mainEntryPath = getMainEntryPath()
-      const mainEntryAEMPath = getAEMImportFilePath(mainEntryPath, options)
+      const aemClientLibPath = getAemClientLibPath(options)
 
       for (const [fileName, chunk] of Object.entries(bundles)) {
         if (!isOutputChunk(chunk) || !chunk.code) {
           continue
-        }
-
-        let aemImportPath = mainEntryAEMPath
-
-        if (options.caching && options.caching.enabled) {
-          aemImportPath = getAEMImportFilePath(mainEntryPath, options, true, rollupOptions as NormalizedOutputOptions)
         }
 
         const source = chunk.code
@@ -131,20 +143,21 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
         for (let index = 0; index < imports.length; index++) {
           const { e: end, d: dynamicIndex, n: importPath, s: start } = imports[index]
 
-          debug('write bundle (dynamic import) chunk: %s', chunk.fileName)
-          debug('write bundle (dynamic import) import: %s\n', importPath)
-
           // Native imports
-          if (
-            dynamicIndex === -1 &&
-            importPath &&
-            importPath.substring(importPath.lastIndexOf('/') + 1) === mainEntryAEMPath
-          ) {
-            str().overwrite(start, end, importPath.substring(0, importPath.lastIndexOf('/') + 1) + aemImportPath)
+          if (dynamicIndex === -1 && importPath && relativePathPattern.test(importPath)) {
+            const replacementPath = getReplacementPath(chunk.fileName, importPath, options, entryAliases)
+
+            debug('write bundle (native import) chunk: %s', chunk.fileName)
+            debug('write bundle (native import) import: %s\n', importPath)
+
+            str().overwrite(start, end, replacementPath)
           }
 
           // Dynamic imports
           if (dynamicIndex > -1) {
+            debug('write bundle (dynamic import) chunk: %s', chunk.fileName)
+            debug('write bundle (dynamic import) import: %s\n', importPath)
+
             const dynamicEnd = source.indexOf(')', end) + 1
             const original = source.slice(dynamicIndex + 8, dynamicEnd - 2)
 
@@ -152,16 +165,28 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
               str().overwrite(
                 dynamicIndex + 8,
                 dynamicEnd - 2,
-                getReplacementPath(original, options, chunk.dynamicImports),
+                getReplacementPath(chunk.fileName, original, options, entryAliases),
               )
             }
           }
         }
 
+        let aemImportPath = aemClientLibPath
         let newSource = (s && s.toString()) || source
 
+        if (options.caching && options.caching.enabled) {
+          aemImportPath = getAemClientLibPath(options, false, true, rollupOptions as NormalizedOutputOptions)
+        }
+
         // Ensure all entry file imports are replaced with the correct AEM ClientLib path
-        newSource = newSource.replace(new RegExp(mainEntryPath, 'g'), aemImportPath)
+        newSource = newSource.replace(new RegExp(aemClientLibPath, 'g'), aemImportPath)
+
+        // Replace any entry paths
+        const relativeClientLibPath = aemImportPath.substring(aemImportPath.lastIndexOf('/') + 1)
+
+        getEntryPaths().forEach((path) => {
+          newSource = newSource.replace(new RegExp(path, 'g'), relativeClientLibPath)
+        })
 
         writeFileSync(join(rollupOptions.dir as string, fileName), newSource)
       }
