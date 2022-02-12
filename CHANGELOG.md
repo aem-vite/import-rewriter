@@ -26,8 +26,8 @@ Please refer to the below for how you should optimally setup your Vite configura
   build: {
     rollupOptions: {
       output: {
-        chunkFileNames: '<clientlib>/resources/js/chunks/[name].js`,
-        entryFileNames: '<clientlib>/resources/js/[name].js`,
+        chunkFileNames: '<clientlib>/resources/js/chunks/[name].js',
+        entryFileNames: '<clientlib>/resources/js/[name].js',
       },
     },
   },
