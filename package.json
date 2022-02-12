@@ -64,7 +64,8 @@
     "debug": "^4.3.3",
     "es-module-lexer": "^0.9.3",
     "magic-string": "^0.25.7",
-    "rollup-pluginutils": "^2.8.2"
+    "rollup-pluginutils": "^2.8.2",
+    "vite": "^2.8.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^16.0.1",
@@ -83,11 +84,10 @@
     "prettier": "^2.5.1",
     "semantic-release": "^17.4.7",
     "tsup": "^5.11.9",
-    "typescript": "^4.5.4",
-    "vite": "*"
+    "typescript": "^4.5.4"
   },
   "peerDependencies": {
-    "vite": ">2.0.0-0"
+    "vite": ">2.6.0"
   },
   "optionalDependencies": {
     "fsevents": "~2.3.2"
