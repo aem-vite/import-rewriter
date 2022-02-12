@@ -1,3 +1,49 @@
+# [5.0.0](https://github.com/aem-vite/import-rewriter/compare/v4.1.3...v5.0.0) (2022-02-12)
+
+
+### Code Refactoring
+
+* remove css rewriter ([3c5c49e](https://github.com/aem-vite/import-rewriter/commit/3c5c49e93f29309b5c04f0391602b158d7401d9e))
+
+
+### Features
+
+* redesign imports handler ([7b1ac3b](https://github.com/aem-vite/import-rewriter/commit/7b1ac3b8438178a67a323f67a618cbcd99809303))
+
+
+### BREAKING CHANGES
+
+* Complete redesign of the dynamic/native imports handler
+
+The previous implementation was kind of clunky and didn't behave correct in most situations. A new `resourcesPath` configuration exists in the bundles rewriter which enforces a strict contract between the handler and your configuration, removing all assumptions.
+
+Please refer to the below for how you should optimally setup your Vite configuration.
+
+```js
+{
+  base: command === 'build' ? '/etc.clientlibs/<project>/clientlibs/<clientlib>/' : '/',
+
+  build: {
+    rollupOptions: {
+      output: {
+        chunkFileNames: '<clientlib>/resources/js/chunks/[name].js`,
+        entryFileNames: '<clientlib>/resources/js/[name].js`,
+      },
+    },
+  },
+
+  plugins: [
+    bundlesImportRewriter({
+      publicPath: '/etc.clientlibs/<project>/clientlibs/<clientlib>',
+      resourcesPath: 'resources/js',
+    }),
+  ],
+}
+```
+* Vite 2.6.x and greater is now required
+
+To keep up with internal fixes and feature additions Vite 2.6.x or greater is required to support `server.origin` which removes the need for the CSS Rewriter.
+
 ## [4.1.3](https://github.com/aem-vite/import-rewriter/compare/v4.1.2...v4.1.3) (2022-01-20)
 
 
