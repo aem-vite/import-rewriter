@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/aem-vite/import-rewriter/issues"
   },
-  "version": "5.0.0",
+  "version": "5.0.1",
   "engines": {
     "node": ">= 12"
   },

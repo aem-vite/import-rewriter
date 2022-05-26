@@ -1,3 +1,10 @@
+## [5.0.1](https://github.com/aem-vite/import-rewriter/compare/v5.0.0...v5.0.1) (2022-05-26)
+
+
+### Bug Fixes
+
+* resolve incorrect plugin instance type ([9ebc985](https://github.com/aem-vite/import-rewriter/commit/9ebc98528b4cd4628f13cd4f79bcefa3ab591fbd))
+
 # [5.0.0](https://github.com/aem-vite/import-rewriter/compare/v4.1.3...v5.0.0) (2022-02-12)
 
 
