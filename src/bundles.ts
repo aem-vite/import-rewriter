@@ -16,7 +16,7 @@ import {
 
 import type { ImportSpecifier } from 'es-module-lexer'
 import type { InputOptions, NormalizedOutputOptions } from 'rollup'
-import type { Plugin } from 'vite'
+import type { PluginOption } from 'vite'
 
 import type { BundlesImportRewriterOptions } from './types'
 
@@ -25,7 +25,7 @@ import type { BundlesImportRewriterOptions } from './types'
  *
  * @param options import rewriter options
  */
-export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Plugin {
+export function bundlesImportRewriter(options: BundlesImportRewriterOptions): PluginOption {
   const entryAliases: NonNullable<InputOptions['input']> = {}
 
   return {
