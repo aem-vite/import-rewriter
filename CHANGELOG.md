@@ -1,3 +1,17 @@
+# [6.0.0](https://github.com/aem-vite/import-rewriter/compare/v5.0.1...v6.0.0) (2022-07-02)
+
+
+### Build System
+
+* increase minimum node version ([572b261](https://github.com/aem-vite/import-rewriter/commit/572b26117d75d27a74563bcd5b5643b45400fd7c))
+
+
+### BREAKING CHANGES
+
+* Increment minimum required node version to v14
+
+As Node v12 is no longer supported we are bringing our minimum supported version of node to v14. Please ensure your project is up to date.
+
 ## [5.0.1](https://github.com/aem-vite/import-rewriter/compare/v5.0.0...v5.0.1) (2022-05-26)
 
 
