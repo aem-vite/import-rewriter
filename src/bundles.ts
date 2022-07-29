@@ -154,19 +154,20 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
           }
 
           // Dynamic imports
-          if (dynamicIndex > -1) {
+          if (dynamicIndex > -1 && importPath) {
             debug('write bundle (dynamic import) chunk: %s', chunk.fileName)
             debug('write bundle (dynamic import) import: %s\n', importPath)
 
             const dynamicEnd = source.indexOf(')', end) + 1
             const original = source.slice(dynamicIndex + 8, dynamicEnd - 2)
 
+            debug(
+              'write bundle (dynamic import) replacement:',
+              getReplacementPath(chunk.fileName, importPath, options, entryAliases),
+            )
+
             if (!original.startsWith('/')) {
-              str().overwrite(
-                dynamicIndex + 8,
-                dynamicEnd - 2,
-                getReplacementPath(chunk.fileName, original, options, entryAliases),
-              )
+              str().overwrite(start + 1, end - 1, getReplacementPath(chunk.fileName, importPath, options, entryAliases))
             }
           }
         }
