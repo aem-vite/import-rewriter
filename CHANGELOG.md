@@ -1,3 +1,10 @@
+## [6.0.1](https://github.com/aem-vite/import-rewriter/compare/v6.0.0...v6.0.1) (2022-07-29)
+
+
+### Bug Fixes
+
+* resolve incorect dynamic import paths ([7fc8f92](https://github.com/aem-vite/import-rewriter/commit/7fc8f92d9ca69a041445bf0a38137185f7e79752))
+
 # [6.0.0](https://github.com/aem-vite/import-rewriter/compare/v5.0.1...v6.0.0) (2022-07-02)
 
 
