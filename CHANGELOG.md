@@ -1,3 +1,17 @@
+# [7.0.0](https://github.com/aem-vite/import-rewriter/compare/v6.0.1...v7.0.0) (2022-11-30)
+
+
+### Features
+
+* support multiple key formats for acs commons ([4fe9015](https://github.com/aem-vite/import-rewriter/commit/4fe9015b8445a8ec54c84f8e7a57fc22c03378f6))
+
+
+### BREAKING CHANGES
+
+* Change default `keyFormat` handling
+
+ACS Commons ships with two different ClientLib path formats. This change introduces support for both. Use `acs-modern` for instances where your ClientLibs contain `ACSHASH` and `acs-classic` when only the MD5 hash exists. For AEMaaCS please ensure you use `cloud`.
+
 ## [6.0.1](https://github.com/aem-vite/import-rewriter/compare/v6.0.0...v6.0.1) (2022-07-29)
 
 
