@@ -59,7 +59,19 @@ export function generateChecksum(source: string): string {
  * @returns a unqiue cache key for the provided `path`
  */
 export function getCacheKey(entryPath: string, keyFormat: AEMLongCacheConfiguration['keyFormat']): string {
-  const keyFormatString = keyFormat === undefined ? 'lc-%s-lc' : typeof keyFormat === 'string' ? keyFormat : '%s'
+  let keyFormatString = ''
+
+  switch (keyFormat) {
+    case 'cloud':
+      keyFormatString = 'lc-%s-lc.%m'
+      break
+    case 'acs-classic':
+      keyFormatString = '%s.%m'
+      break
+    case 'acs-modern':
+      keyFormatString = '%m.ACSHASH%s'
+      break
+  }
 
   const combinedContents = [...entryPaths].map((entry) => {
     const path = join(entryPath, entry)
@@ -94,10 +106,9 @@ export function getAemClientLibPath(
   if (withChecksum && options.caching && options.caching.enabled && rollupOptions !== undefined) {
     const entryPath = rollupOptions.dir as string
 
-    // Append the md5 checksum to the path
+    // Append the MD5 checksum and minified extension to the path
     path = `${path}.${getCacheKey(entryPath, options.caching.keyFormat)}`
-
-    return `${path}${options.minify === true ? '.min' : ''}.js`
+    path = path.replace('.%m', options.minify === true ? '.min' : '')
   }
 
   return `${path}.js`
