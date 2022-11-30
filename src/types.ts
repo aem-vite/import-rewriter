@@ -14,14 +14,16 @@ export interface AEMLongCacheConfiguration {
   /**
    * Define the long cache key format that will be injected into the entry paths.
    *
-   * Ensure you set this correctly for your particular AEM configuration as it will change
-   * when using the AEM SDK (AEMaaCS) vs using ACS Commons Versioned ClientLibs. When using
-   * ACS Commons Versioned ClientLibs you will need to set this to `false` as it only uses
-   * an MD5 checksum.
+   * Ensure you choose the correct format for your AEM version and ACS Commons. Newer versions
+   * of ACS Commons use a different format so it is vital to ensure you are using the correct
+   * one. Choose 'acs-modern' for ACS Commons when ACSHASH is present in ClientLib URLs, otherwise
+   * choose 'acs-classic'.
    *
-   * @default lc-%s-lc
+   * Set to `false` to disable this functionality completely.
+   *
+   * @default cloud
    */
-  keyFormat?: string | false
+  keyFormat?: 'cloud' | 'acs-modern' | 'acs-classic' | false
 }
 
 export interface BaseImportRewriterOptions {
