@@ -37,7 +37,7 @@ export function setEntryPath(path: string): void {
  * @returns `true` when `OutputChunk`, otherwise `false`
  */
 export function isOutputChunk(assetOrChunk: OutputAsset | OutputChunk): assetOrChunk is OutputChunk {
-  return typeof (assetOrChunk as OutputChunk).imports !== undefined
+  return Array.isArray((assetOrChunk as OutputChunk).imports)
 }
 
 /**

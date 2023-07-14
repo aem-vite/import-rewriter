@@ -79,7 +79,7 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
         imports = parseImports(source)[0]
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
-        this.error(e, e.idx)
+        this.error({ ...e })
       }
 
       if (!imports.length) {
@@ -130,7 +130,7 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
           imports = parseImports(source)[0]
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
-          this.error(e, e.idx)
+          this.error({ ...e })
         }
 
         if (!imports.length) {
