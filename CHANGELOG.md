@@ -1,3 +1,17 @@
+# [8.0.0](https://github.com/aem-vite/import-rewriter/compare/v7.0.0...v8.0.0) (2023-07-14)
+
+
+### Build System
+
+* increase minimum node and vite versions ([2d71162](https://github.com/aem-vite/import-rewriter/commit/2d71162bc7976de94ad3aac23d55804e7dab6e07))
+
+
+### BREAKING CHANGES
+
+* bump min node and vite versions
+
+Node v16 and Vite v3.0.0 are required moving forward.
+
 # [7.0.0](https://github.com/aem-vite/import-rewriter/compare/v6.0.1...v7.0.0) (2022-11-30)
 
 
