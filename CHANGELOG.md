@@ -1,3 +1,21 @@
+# [9.0.0](https://github.com/aem-vite/import-rewriter/compare/v8.0.0...v9.0.0) (2023-11-20)
+
+
+### Build System
+
+* drop native CJS support ([5b7f4fc](https://github.com/aem-vite/import-rewriter/commit/5b7f4fcec81faf5d2aa45b35387cb82490c997d9))
+* increase minimum node and vite versions ([d3b0294](https://github.com/aem-vite/import-rewriter/commit/d3b0294d851ba91447ecc8baa6ceecbbc5c05eac))
+
+
+### BREAKING CHANGES
+
+* no longer support CJS
+
+Vite 5 deprecates CJS support and as such support has been dropped here
+* bump min node and vite versions
+
+Node v18/20 and Vite v5+ are required moving forward.
+
 # [8.0.0](https://github.com/aem-vite/import-rewriter/compare/v7.0.0...v8.0.0) (2023-07-14)
 
 
