@@ -1,11 +1,7 @@
 {
   "root": true,
-  
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended"
-  ],
+
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"],
 
   "plugins": ["prettier"],
 
@@ -13,6 +9,6 @@
 
   "parserOptions": {
     "sourceType": "module",
-    "ecmaVersion": 2020
+    "ecmaVersion": 2022
   }
 }
