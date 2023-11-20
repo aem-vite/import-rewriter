@@ -8,21 +8,30 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      id-token: write
+
     steps:
       - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
-        name: Install Node.js
-        with:
-          node-version: 16
 
       - uses: pnpm/action-setup@v2
         name: Install pnpm
         with:
-          version: 8.6.7
+          version: 8.9.2
+
+      - uses: actions/setup-node@v3
+        name: Install Node.js
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Update npm
+        run: npm install -g npm@latest
 
       - name: Install dependencies
-        run: pnpm i --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Lint our source code
         run: pnpm lint
