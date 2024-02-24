@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     coverage: {
       reportsDirectory: '../coverage',
-      reporter: ['html'],
+      reporter: process.env.GITHUB_ACTIONS ? ['github-actions'] : ['html'],
     },
 
     root: './src',
