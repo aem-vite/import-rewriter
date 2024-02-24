@@ -1,0 +1,14 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`cache key should match 1`] = `
+[
+  "lc-098f6bcd4621d373cade4e832627b4f6-lc.%m",
+  "098f6bcd4621d373cade4e832627b4f6.%m",
+  "%m.ACSHASH098f6bcd4621d373cade4e832627b4f6",
+  "098f6bcd4621d373cade4e832627b4f6",
+]
+`;
+
+exports[`checksum should match 1`] = `"098f6bcd4621d373cade4e832627b4f6"`;
+
+exports[`clientlib path should contain invalid hash 1`] = `"/etc.clientlibs/aem-vite/clientlibs/clientlib-site.ACSHASHd41d8cd98f00b204e9800998ecf8427e.js"`;
