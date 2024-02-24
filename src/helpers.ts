@@ -71,6 +71,8 @@ export function getCacheKey(entryPath: string, keyFormat: AEMLongCacheConfigurat
     case 'acs-modern':
       keyFormatString = '%m.ACSHASH%s'
       break
+    default:
+      throw new Error(`Invalid key format provided: ${keyFormat}`)
   }
 
   const combinedContents = [...entryPaths].map((entry) => {
