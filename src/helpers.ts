@@ -1,7 +1,7 @@
-import { createHash } from 'crypto'
 import _debug from 'debug'
-import { existsSync, readFileSync } from 'fs'
-import { join } from 'path'
+import { createHash } from 'node:crypto'
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 import type { InputOptions, NormalizedOutputOptions } from 'rollup'
 
