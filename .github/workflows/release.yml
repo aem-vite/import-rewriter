@@ -14,14 +14,14 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v3
         name: Install pnpm
         with:
-          version: 8.9.2
+          version: 8
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         name: Install Node.js
         with:
           node-version: 20
