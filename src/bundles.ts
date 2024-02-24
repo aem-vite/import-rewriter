@@ -1,6 +1,3 @@
-import { writeFileSync } from 'fs'
-import { join } from 'path'
-
 import { init, parse as parseImports } from 'es-module-lexer'
 import MagicString from 'magic-string'
 
@@ -9,13 +6,12 @@ import {
   getAemClientLibPath,
   getEntryPaths,
   getReplacementPath,
-  isOutputChunk,
   relativePathPattern,
   setEntryPath,
 } from './helpers'
 
 import type { ImportSpecifier } from 'es-module-lexer'
-import type { InputOptions, NormalizedOutputOptions } from 'rollup'
+import type { InputOptions } from 'rollup'
 import type { PluginOption } from 'vite'
 
 import type { BundlesImportRewriterOptions } from './types'
@@ -60,7 +56,7 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
         return null
       }
 
-      if (!options.publicPath || !options.publicPath.length) {
+      if (!options?.publicPath.length) {
         this.error(
           `'publicPath' doesn't appear to be defined, see https://aemvite.dev/guide/faqs/#vite-errors for more information.`,
         )
@@ -89,15 +85,16 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
       let s!: MagicString
       const str = () => s || (s = new MagicString(source))
 
-      for (let index = 0; index < imports.length; index++) {
-        const { e: end, d: dynamicIndex, n: importPath, s: start } = imports[index]
+      for (const element of imports) {
+        const { e: end, d: dynamicIndex, n: importPath, s: start } = element
 
         if (dynamicIndex === -1 && importPath && relativePathPattern.test(importPath)) {
           const replacementPath = getReplacementPath(chunk.fileName, importPath, options, entryAliases)
 
-          debug('render chunk (dynamic import) chunk: %s', chunk.fileName)
-          debug('render chunk (dynamic import) import: %s', importPath)
-          debug('render chunk (dynamic import) replacement: %s\n', replacementPath)
+          debug('(render chunk)')
+          debug('chunk file name:       %s', chunk.fileName)
+          debug('import path:           %s', importPath)
+          debug('updated import path:   %s\n', replacementPath)
 
           str().overwrite(start, end, replacementPath)
         }
@@ -113,13 +110,20 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
       return null
     },
 
-    async writeBundle(rollupOptions, bundles) {
+    async generateBundle(rollupOptions, output, isWrite) {
       const aemClientLibPath = getAemClientLibPath(options)
 
-      for (const [fileName, chunk] of Object.entries(bundles)) {
-        if (!isOutputChunk(chunk) || !chunk.code) {
+      debug('(generate bundle)')
+      debug('aem clientlib path: %s', aemClientLibPath)
+      debug('is write: %s', isWrite)
+
+      for (const [fileName, chunk] of Object.entries(output)) {
+        if (chunk.type !== 'chunk' || !chunk.imports) {
           continue
         }
+
+        debug('(generate bundle)')
+        debug('bundle name:           %s', fileName)
 
         const source = chunk.code
 
@@ -140,31 +144,30 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
         let s!: MagicString
         const str = () => s || (s = new MagicString(source))
 
-        for (let index = 0; index < imports.length; index++) {
-          const { e: end, d: dynamicIndex, n: importPath, s: start } = imports[index]
+        for (const element of imports) {
+          const { e: end, d: dynamicIndex, n: importPath, s: start } = element
 
           // Native imports
           if (dynamicIndex === -1 && importPath && relativePathPattern.test(importPath)) {
             const replacementPath = getReplacementPath(chunk.fileName, importPath, options, entryAliases)
 
-            debug('write bundle (native import) chunk: %s', chunk.fileName)
-            debug('write bundle (native import) import: %s\n', importPath)
+            debug('chunk file name:       %s', chunk.fileName)
+            debug('import type:           native')
+            debug('import path:           %s\n', importPath)
 
             str().overwrite(start, end, replacementPath)
           }
 
           // Dynamic imports
           if (dynamicIndex > -1 && importPath) {
-            debug('write bundle (dynamic import) chunk: %s', chunk.fileName)
-            debug('write bundle (dynamic import) import: %s\n', importPath)
+            debug('chunk file name:       %s', chunk.fileName)
+            debug('import type:           dynamic')
+            debug('import path:           %s', importPath)
 
             const dynamicEnd = source.indexOf(')', end) + 1
             const original = source.slice(dynamicIndex + 8, dynamicEnd - 2)
 
-            debug(
-              'write bundle (dynamic import) replacement:',
-              getReplacementPath(chunk.fileName, importPath, options, entryAliases),
-            )
+            debug('updated import path:   %s\n', getReplacementPath(chunk.fileName, importPath, options, entryAliases))
 
             if (!original.startsWith('/')) {
               str().overwrite(start + 1, end - 1, getReplacementPath(chunk.fileName, importPath, options, entryAliases))
@@ -173,10 +176,10 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
         }
 
         let aemImportPath = aemClientLibPath
-        let newSource = (s && s.toString()) || source
+        let newSource = s?.toString() ?? source
 
         if (options.caching && options.caching.enabled) {
-          aemImportPath = getAemClientLibPath(options, false, true, rollupOptions as NormalizedOutputOptions)
+          aemImportPath = getAemClientLibPath(options, false, true, rollupOptions)
         }
 
         // Ensure all entry file imports are replaced with the correct AEM ClientLib path
@@ -189,7 +192,8 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
           newSource = newSource.replace(new RegExp(path, 'g'), relativeClientLibPath)
         })
 
-        writeFileSync(join(rollupOptions.dir as string, fileName), newSource)
+        chunk.code = newSource
+        chunk.map = rollupOptions.sourcemap !== false ? s.generateMap({ hires: true }) : null
       }
     },
   }

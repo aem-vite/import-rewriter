@@ -3,7 +3,7 @@ import _debug from 'debug'
 import { existsSync, readFileSync } from 'fs'
 import { join } from 'path'
 
-import type { InputOptions, NormalizedOutputOptions, OutputAsset, OutputChunk } from 'rollup'
+import type { InputOptions, NormalizedOutputOptions } from 'rollup'
 
 import type { AEMLongCacheConfiguration, BundlesImportRewriterOptions } from './types'
 
@@ -28,16 +28,6 @@ export function getEntryPaths() {
  */
 export function setEntryPath(path: string): void {
   entryPaths.add(path)
-}
-
-/**
- * Determine if the provided `assetOrChunk` object is a chunk instance.
- *
- * @param assetOrChunk an instance of either `OutputAsset` or `OutputChunk`
- * @returns `true` when `OutputChunk`, otherwise `false`
- */
-export function isOutputChunk(assetOrChunk: OutputAsset | OutputChunk): assetOrChunk is OutputChunk {
-  return Array.isArray((assetOrChunk as OutputChunk).imports)
 }
 
 /**
@@ -155,5 +145,5 @@ export function getReplacementPath(
 export function isInputAnEntryAlias(input: string, entryAliases: NonNullable<InputOptions['input']>) {
   const entryAliasesExpr = new RegExp(`^[./]+(${Object.keys(entryAliases).join('|')})\\.js$`)
 
-  return input.match(entryAliasesExpr)?.[0] ? true : false
+  return !!RegExp(entryAliasesExpr).exec(input)?.[0]
 }
