@@ -32,5 +32,11 @@ jobs:
       - name: Test
         run: pnpm test:coverage
 
+      - name: Code Coverage
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: coverage/cobertura-coverage.xml
+          badge: true
+
       - name: Build
         run: pnpm build

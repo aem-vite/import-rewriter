@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     coverage: {
       provider: 'v8',
+      reporter: ['cobertura', 'text'],
       reportsDirectory: '../coverage',
     },
 
