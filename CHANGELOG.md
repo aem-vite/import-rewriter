@@ -1,3 +1,15 @@
+# [9.1.0](https://github.com/aem-vite/import-rewriter/compare/v9.0.0...v9.1.0) (2025-07-18)
+
+
+### Bug Fixes
+
+* ensure invalid cache key triggers error ([e4d4b42](https://github.com/aem-vite/import-rewriter/commit/e4d4b425c00398031e999dc4accc73536c8c44ca))
+
+
+### Features
+
+* add support for custom cache key format [#3](https://github.com/aem-vite/import-rewriter/issues/3) ([4a233e4](https://github.com/aem-vite/import-rewriter/commit/4a233e468639c0abf645ba7b36f92bc2a89abba8))
+
 # [9.0.0](https://github.com/aem-vite/import-rewriter/compare/v8.0.0...v9.0.0) (2023-11-20)
 
 
