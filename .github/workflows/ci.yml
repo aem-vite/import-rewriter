@@ -1,6 +1,11 @@
-name: Build
+name: CI
 
 on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
   push:
     branches-ignore:
       - main
@@ -10,18 +15,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8
+        uses: pnpm/action-setup@v4.1.0
 
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4.4.0
         with:
-          node-version: 20
           cache: 'pnpm'
+          node-version-file: '.nvmrc'
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
