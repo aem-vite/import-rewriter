@@ -58,23 +58,6 @@
     "test:ui": "vitest --ui --coverage.enabled=true",
     "test:coverage": "vitest run --coverage"
   },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ],
-    "rules": {
-      "body-max-line-length": [
-        2,
-        "always",
-        200
-      ],
-      "footer-max-line-length": [
-        2,
-        "always",
-        300
-      ]
-    }
-  },
   "dependencies": {
     "debug": "^4.3.4",
     "es-module-lexer": "^1.4.1",
