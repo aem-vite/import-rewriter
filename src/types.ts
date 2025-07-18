@@ -1,3 +1,8 @@
+interface AEMCustomKeyFormat {
+  format: string
+  type: 'custom'
+}
+
 export interface AEMLongCacheConfiguration {
   /**
    * Set to `true` to have an MD5 checksum automatically generated for the JavaScript entries paths.
@@ -21,9 +26,23 @@ export interface AEMLongCacheConfiguration {
    *
    * Set to `false` to disable this functionality completely.
    *
+   * A `custom` format object can also be provided, which allows you to define your own format string.
+   *
+   * Two placeholders are available:
+   * - `%s` - the ClientLib MD5 checksum
+   * - `%m` - `.min` when available, otherwise empty
+   *
+   * @example
+   * ```ts
+   * keyFormat: {
+   *   format: 'foo-%s%m',
+   *   type: 'custom',
+   * }
+   * ```
+   *
    * @default cloud
    */
-  keyFormat?: 'cloud' | 'acs-modern' | 'acs-classic' | false
+  keyFormat?: AEMCustomKeyFormat | 'cloud' | 'acs-modern' | 'acs-classic' | false
 }
 
 export interface BaseImportRewriterOptions {
