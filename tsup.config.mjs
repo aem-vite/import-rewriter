@@ -8,5 +8,5 @@ export default defineConfig({
   outDir: 'lib',
   sourcemap: false,
   splitting: true,
-  target: ['node18', 'node20'],
+  target: ['node20', 'node22', 'node24'],
 })
