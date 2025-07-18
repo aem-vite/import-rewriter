@@ -23,7 +23,7 @@ assignees: ''
 
 ### System Info
 
-Output of `npx envinfo --system --npmPackages @aem-vite/aem-vite --binaries --browsers`:
+Output of `npx envinfo --system --npmPackages @aem-vite/import-rewriter --binaries --browsers`:
 
 ```node
 
@@ -54,5 +54,5 @@ Used package manager: <!-- npm | yarn | pnpm -->
 - [ ] Read the [documentation](https://aemvite.dev/guide/).
 - [ ] Check that there isn't already an issue that reports the same bug to avoid creating a duplicate.
 - [ ] Provide a description in this issue that describes the bug.
-- [ ] Make sure this is an issue with `@aem-vite/aem-vite` and not a Rollup/Vite issue.
+- [ ] Make sure this is an issue with `@aem-vite/import-rewriter` and not a Rollup/Vite issue.
 - [ ] Check that this is a concrete bug. For Q&A open a [GitHub discussion](https://github.com/aem-vite/import-rewriter/discussions).
