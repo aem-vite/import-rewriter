@@ -65,9 +65,7 @@ export function getCacheKey(entryPath: string, keyFormat: AEMLongCacheConfigurat
       if (typeof keyFormat === 'object' && keyFormat.type === 'custom' && keyFormat.format) {
         keyFormatString = keyFormat.format
       } else {
-        throw new Error(
-          `Invalid or missing long cache key format provided: ${keyFormat}. Please ensure you are using a valid format.`,
-        )
+        throw new Error(`Invalid key format provided: ${keyFormat}`)
       }
   }
 
