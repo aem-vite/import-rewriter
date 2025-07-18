@@ -62,7 +62,13 @@ export function getCacheKey(entryPath: string, keyFormat: AEMLongCacheConfigurat
       keyFormatString = '%m.ACSHASH%s'
       break
     default:
-      throw new Error(`Invalid key format provided: ${keyFormat}`)
+      if (typeof keyFormat === 'object' && keyFormat.type === 'custom' && keyFormat.format) {
+        keyFormatString = keyFormat.format
+      } else {
+        throw new Error(
+          `Invalid or missing long cache key format provided: ${keyFormat}. Please ensure you are using a valid format.`,
+        )
+      }
   }
 
   const combinedContents = [...entryPaths].map((entry) => {
