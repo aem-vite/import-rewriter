@@ -52,20 +52,18 @@ export function getCacheKey(entryPath: string, keyFormat: AEMLongCacheConfigurat
   let keyFormatString = ''
 
   switch (keyFormat) {
-    case 'cloud':
-      keyFormatString = 'lc-%s-lc.%m'
-      break
     case 'acs-classic':
       keyFormatString = '%s.%m'
       break
     case 'acs-modern':
       keyFormatString = '%m.ACSHASH%s'
       break
+    case 'cloud':
     default:
       if (typeof keyFormat === 'object' && keyFormat.type === 'custom' && keyFormat.format) {
         keyFormatString = keyFormat.format
       } else {
-        throw new Error(`Invalid key format provided: ${keyFormat}`)
+        keyFormatString = 'lc-%s-lc.%m'
       }
   }
 
