@@ -57,8 +57,8 @@ test('cache key should match', () => {
   expect([cacheKey, classicAcsCacheKey, modernAcsCacheKey, checksum]).toMatchSnapshot()
 })
 
-test('invalid cache key should throw', () => {
-  expect(() => getCacheKey('test', undefined)).toThrowError('Invalid key format provided: undefined')
+test("invalid cache key should default to 'cloud'", () => {
+  expect(getCacheKey('test', undefined)).toStrictEqual('lc-098f6bcd4621d373cade4e832627b4f6-lc.%m')
 })
 
 test('clientlib path is correct', () => {
