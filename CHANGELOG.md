@@ -1,3 +1,11 @@
+## [9.1.1](https://github.com/aem-vite/import-rewriter/compare/v9.1.0...v9.1.1) (2025-08-30)
+
+
+### Bug Fixes
+
+* ensure cache key format defaults to `cloud` ([3ae4a41](https://github.com/aem-vite/import-rewriter/commit/3ae4a41264497a0774e7c26a17f3a46e8da57772))
+* regression fix for entry bundle hashsum ([35eb464](https://github.com/aem-vite/import-rewriter/commit/35eb46418eff4f07ce73a6c669d22439bd2542c8))
+
 # [9.1.0](https://github.com/aem-vite/import-rewriter/compare/v9.0.0...v9.1.0) (2025-07-18)
 
 
