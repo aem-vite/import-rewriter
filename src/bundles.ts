@@ -11,6 +11,8 @@ import {
 } from './helpers'
 
 import type { ImportSpecifier } from 'es-module-lexer'
+import { writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import type { InputOptions } from 'rollup'
 import type { PluginOption } from 'vite'
 
@@ -110,14 +112,13 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
       return null
     },
 
-    async generateBundle(rollupOptions, output, isWrite) {
+    async writeBundle(rollupOptions, bundle) {
       const aemClientLibPath = getAemClientLibPath(options)
 
       debug('(generate bundle)')
       debug('aem clientlib path: %s', aemClientLibPath)
-      debug('is write: %s', isWrite)
 
-      for (const [fileName, chunk] of Object.entries(output)) {
+      for (const [fileName, chunk] of Object.entries(bundle)) {
         if (chunk.type !== 'chunk' || !chunk.imports) {
           continue
         }
@@ -194,6 +195,12 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
 
         chunk.code = newSource
         chunk.map = rollupOptions.sourcemap !== false ? s.generateMap({ hires: true }) : null
+
+        if (!chunk.isEntry) {
+          debug('generate entry chunk:  %s', chunk.fileName)
+
+          await writeFile(join(rollupOptions.dir as string, fileName), newSource)
+        }
       }
     },
   }
