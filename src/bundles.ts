@@ -196,11 +196,9 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
         chunk.code = newSource
         chunk.map = rollupOptions.sourcemap !== false ? s.generateMap({ hires: true }) : null
 
-        if (!chunk.isEntry) {
-          debug('generate entry chunk:  %s', chunk.fileName)
+        debug('generate entry chunk:  %s', chunk.fileName)
 
-          await writeFile(join(rollupOptions.dir as string, fileName), newSource)
-        }
+        await writeFile(join(rollupOptions.dir as string, fileName), newSource)
       }
     },
   }
