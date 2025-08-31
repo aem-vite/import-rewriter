@@ -1,3 +1,10 @@
+## [9.1.2](https://github.com/aem-vite/import-rewriter/compare/v9.1.1...v9.1.2) (2025-08-31)
+
+
+### Bug Fixes
+
+* bundle imports using incorrect path ([b09f1a4](https://github.com/aem-vite/import-rewriter/commit/b09f1a48e79ad3576284a5dc94868c585a7207f9))
+
 ## [9.1.1](https://github.com/aem-vite/import-rewriter/compare/v9.1.0...v9.1.1) (2025-08-30)
 
 
