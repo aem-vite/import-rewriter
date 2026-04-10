@@ -2,6 +2,7 @@ import { init, parse as parseImports } from 'es-module-lexer'
 import MagicString from 'magic-string'
 
 import {
+  clearEntryPaths,
   debug,
   getAemClientLibPath,
   getEntryPaths,
@@ -32,6 +33,8 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
     name: 'aem-vite:import-rewriter',
 
     configResolved(config) {
+      clearEntryPaths()
+
       const inputs = config.build.rollupOptions.input
 
       if (!inputs || typeof inputs !== 'object' || Array.isArray(inputs)) {
@@ -194,7 +197,7 @@ export function bundlesImportRewriter(options: BundlesImportRewriterOptions): Pl
         })
 
         chunk.code = newSource
-        chunk.map = rollupOptions.sourcemap !== false ? s.generateMap({ hires: true }) : null
+        chunk.map = rollupOptions.sourcemap !== false && s ? s.generateMap({ hires: true }) : null
 
         debug('generate entry chunk:  %s', chunk.fileName)
 

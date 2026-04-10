@@ -1,6 +1,15 @@
 import { beforeEach, afterEach, expect, test, vi } from 'vitest'
 
-import { generateChecksum, getAemClientLibPath, getCacheKey, getEntryPaths, setEntryPath } from '../helpers'
+import {
+  clearEntryPaths,
+  generateChecksum,
+  getAemClientLibPath,
+  getCacheKey,
+  getEntryPaths,
+  getReplacementPath,
+  isInputAnEntryAlias,
+  setEntryPath,
+} from '../helpers'
 
 import type { NormalizedOutputOptions } from 'rollup'
 
@@ -20,6 +29,8 @@ const rollupOptions = {
 } as NormalizedOutputOptions
 
 beforeEach(() => {
+  clearEntryPaths()
+
   vi.mock('node:fs', async () => {
     return {
       ...(await vi.importActual<typeof import('node:fs')>('node:fs')),
@@ -39,12 +50,21 @@ test('entry path should be set', () => {
   expect(getEntryPaths()).toStrictEqual(new Set(['importer']))
 })
 
+test('entry paths should be reset', () => {
+  setEntryPath('importer')
+  clearEntryPaths()
+
+  expect(getEntryPaths()).toStrictEqual(new Set())
+})
+
 test('checksum should match', () => {
   expect(checksum).toEqual('098f6bcd4621d373cade4e832627b4f6')
   expect(checksum).toMatchSnapshot()
 })
 
 test('cache key should match', () => {
+  setEntryPath('importer')
+
   const checksum = generateChecksum('test')
   const cacheKey = getCacheKey('test', 'cloud')
   const classicAcsCacheKey = getCacheKey('test', 'acs-classic')
@@ -58,6 +78,8 @@ test('cache key should match', () => {
 })
 
 test("invalid cache key should default to 'cloud'", () => {
+  setEntryPath('importer')
+
   expect(getCacheKey('test', undefined)).toStrictEqual('lc-098f6bcd4621d373cade4e832627b4f6-lc.%m')
 })
 
@@ -68,6 +90,8 @@ test('clientlib path is correct', () => {
 })
 
 test('clientlib path should contain hash', async () => {
+  setEntryPath('importer')
+
   const options: BundlesImportRewriterOptions = {
     ...defaultPluginOptions,
 
@@ -127,4 +151,22 @@ test('clientlib resource path should match', async () => {
   const path = getAemClientLibPath(options, true, false, rollupOptions)
 
   expect(path).toEqual(`${PUBLIC_PATH}/${options.resourcesPath}/`)
+})
+
+test('entry alias matching should escape regex characters', () => {
+  const entryAliases = {
+    'main.entry': '/src/main.entry.ts',
+  }
+
+  expect(isInputAnEntryAlias('./main.entry.js', entryAliases)).toBe(true)
+  expect(isInputAnEntryAlias('./mainXentry.js', entryAliases)).toBe(false)
+})
+
+test('replacement path should match aliases literally', () => {
+  const entryAliases = {
+    'main.entry': '/src/main.entry.ts',
+  }
+  const path = getReplacementPath('chunk.js', '../main.entry.js', defaultPluginOptions, entryAliases)
+
+  expect(path).toEqual(`${PUBLIC_PATH}.js`)
 })
