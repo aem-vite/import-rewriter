@@ -22,6 +22,13 @@ export function getEntryPaths() {
 }
 
 /**
+ * Clear all tracked entry paths.
+ */
+export function clearEntryPaths(): void {
+  entryPaths.clear()
+}
+
+/**
  * Add the provided `path` to the available entry paths.
  *
  * @param path the path to the entry file
@@ -129,9 +136,11 @@ export function getReplacementPath(
     return path.replace(new RegExp(`^${relativePathPattern.source}`), getAemClientLibPath(options, true))
   }
 
+  const importPath = path.replace(new RegExp(`^${relativePathPattern.source}`), '')
+
   return isInputAnEntryAlias(path, entryAliases)
     ? path.replace(
-        new RegExp(`${relativePathPattern.source}${path.replace(relativePathPattern, '')}`),
+        new RegExp(`^${relativePathPattern.source}${escapeRegExp(importPath)}$`),
         getAemClientLibPath(options),
       )
     : path
@@ -145,7 +154,16 @@ export function getReplacementPath(
  * @returns `true` when `input` is an alias, otherwise `false`
  */
 export function isInputAnEntryAlias(input: string, entryAliases: NonNullable<InputOptions['input']>) {
-  const entryAliasesExpr = new RegExp(`^[./]+(${Object.keys(entryAliases).join('|')})\\.js$`)
+  const aliases = Object.keys(entryAliases)
+  if (!aliases.length) {
+    return false
+  }
+  const escapedAliases = aliases.map((alias) => escapeRegExp(alias))
+  const entryAliasesExpr = new RegExp(`^[./]+(${escapedAliases.join('|')})\\.js$`)
 
-  return !!RegExp(entryAliasesExpr).exec(input)?.[0]
+  return entryAliasesExpr.test(input)
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
